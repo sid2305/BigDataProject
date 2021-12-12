@@ -1,0 +1,568 @@
+﻿{
+  "paragraphs": [
+    {
+      "user": "nbuser",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=50",
+              "$$hashKey": "object:1808"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=51",
+              "$$hashKey": "object:1809"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=52",
+              "$$hashKey": "object:1810"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=53",
+              "$$hashKey": "object:1811"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=54",
+              "$$hashKey": "object:1812"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=55",
+              "$$hashKey": "object:1813"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=56",
+              "$$hashKey": "object:1814"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639303743926_2009293985",
+      "id": "paragraph_1639303743926_2009293985",
+      "dateCreated": "2021-12-12T05:09:03-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:316",
+      "text": "%pyspark\nhistorical_dob_df = spark.read.options(header='true').csv('/user/CS-GY-6513/project_data/data-cityofnewyork-us.bty7-2jhb.csv')\ndob_permit_issuance = spark.read.options(header='true').csv('/user/CS-GY-6513/project_data/data-cityofnewyork-us.ipu4-2q9a.csv')\ndob_cert_occupancy_df = spark.read.options(header='true').csv('/user/CS-GY-6513/project_data/data-cityofnewyork-us.bs8b-p36w.csv')\nhousing_litigations_df = spark.read.options(header='true').csv('/user/CS-GY-6513/project_data/data-cityofnewyork-us.59kj-x8nc.csv')\nhousing_maintenance_code_complaints_df = spark.read.options(header='true').csv('/user/CS-GY-6513/project_data/data-cityofnewyork-us.uwyv-629c.csv')\nhousing_maintenance_code_violations_df = spark.read.options(header='true').csv('/user/CS-GY-6513/project_data/data-cityofnewyork-us.wvxf-dwi5.csv')\ndob_job_application_filings = spark.read.options(header='true').csv('/user/CS-GY-6513/project_data/data-cityofnewyork-us.ic3t-wcy2.csv')\nhistorical_dob_df.createOrReplaceTempView('historical_dob')\ndob_permit_issuance.createOrReplaceTempView('permit_issuance')\ndob_cert_occupancy_df.createOrReplaceTempView('dob_cert_occupancy')\nhousing_litigations_df.createOrReplaceTempView('housing_litigations')\nhousing_maintenance_code_complaints_df.createOrReplaceTempView('housing_maintenance_code_complaints')\nhousing_maintenance_code_violations_df.createOrReplaceTempView('housing_maintenance_code_violations')\ndob_job_application_filings.createOrReplaceTempView('dob_job_application_filings')",
+      "dateUpdated": "2021-12-12T05:27:55-0500",
+      "dateFinished": "2021-12-12T05:27:56-0500",
+      "dateStarted": "2021-12-12T05:27:55-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      }
+    },
+    {
+      "text": "%pyspark\n# Get a list of Job #s in the dataset that don't follow the rules for Job doc #s. The rule is that each job application should have an 01 document, and each additional\n# document receives an ID that increases by 1. So for a given job application, the document IDs should go 1,2,3,4,etc. without skipping any\n# We should find a data source to fill in the blanks, or else possibly delete these job #s\n\ndef count_document_violations(tablename, jobCol, docCol):\n    violations = spark.sql(f\"select dpm.`{jobCol}`, dpm.max, dpc.count from (select p.`{jobCol}`, max(p.`{docCol}`) as max from {tablename} p group by `{jobCol}`) dpm inner join (select dp.`{jobCol}`, count(1) as count from (select distinct p.`{jobCol}`, p.`{docCol}` from {tablename} p order by p.`{jobCol}`, p.`{docCol}`) dp group by dp.`{jobCol}`) dpc on dpm.`{jobCol}` = dpc.`{jobCol}` where dpm.max <> dpc.count\")\n    violations.show()\n    violations.cache()\n    print(violations.count())\n    ",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T05:33:44-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639304904763_1103484982",
+      "id": "paragraph_1639304904763_1103484982",
+      "dateCreated": "2021-12-12T05:28:24-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:1865",
+      "dateFinished": "2021-12-12T05:33:44-0500",
+      "dateStarted": "2021-12-12T05:33:44-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      }
+    },
+    {
+      "text": "%pyspark\nfrom csv import reader\nfrom operator import add\n\ndef string_col_to_int(keyOrd, colOrd, l):\n    try:\n        col = int(l[colOrd])\n    except:\n        col = None\n        \n    return (l[keyOrd], col)\n    \ndef find_document_violations(filename, firstCol, jobNoOrd, docOrd):\n    lines = sc.textFile(filename)\n    data = lines.mapPartitions(lambda l: reader(l)).filter(lambda l: l[0] != firstCol)\n    job_groups = data.map(lambda l: string_col_to_int(jobNoOrd, docOrd, l)).filter(lambda l: l[1] is not None).distinct().groupByKey()\n    return job_groups.map(lambda l: (l[0], len(l[1]), max(l[1]))).filter(lambda l: l[1] != l[2])",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T06:15:05-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639306076008_242427475",
+      "id": "paragraph_1639306076008_242427475",
+      "dateCreated": "2021-12-12T05:47:56-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:2496",
+      "dateFinished": "2021-12-12T06:15:05-0500",
+      "dateStarted": "2021-12-12T06:15:05-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": []
+      }
+    },
+    {
+      "text": "%pyspark\ncount_document_violations('historical_dob', 'Job #', 'Job doc. #')",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T05:33:48-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=59",
+              "$$hashKey": "object:2197"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=60",
+              "$$hashKey": "object:2198"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639305173257_955552243",
+      "id": "paragraph_1639305173257_955552243",
+      "dateCreated": "2021-12-12T05:32:53-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:1989",
+      "dateFinished": "2021-12-12T05:33:48-0500",
+      "dateStarted": "2021-12-12T05:33:48-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+---------+---+-----+\n|    Job #|max|count|\n+---------+---+-----+\n|100292345|  4|    2|\n|100444075|  4|    2|\n|100721523|  6|    5|\n|100749451|  3|    2|\n|100817573|  3|    2|\n|101472728|  4|    2|\n|101667206|  3|    2|\n|103177731|  3|    2|\n|103219018|  3|    2|\n|104427700|  3|    2|\n|104756694|  3|    2|\n|120653024|  4|    3|\n|121324995|  4|    2|\n|200108338|  3|    2|\n|200587294|  4|    2|\n|200602990|  3|    2|\n|200649101|  3|    2|\n|200649147|  3|    2|\n|300125433|  2|    1|\n|300499235|  3|    2|\n+---------+---+-----+\nonly showing top 20 rows\n\n6674\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%pyspark\nhistorical_dob_violations = find_document_violations('/user/CS-GY-6513/project_data/data-cityofnewyork-us.bty7-2jhb.csv', 'BOROUGH', 4, 5)\nprint(historical_dob_violations.count())",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T06:16:44-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=77",
+              "$$hashKey": "object:3416"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639307696705_1075555389",
+      "id": "paragraph_1639307696705_1075555389",
+      "dateCreated": "2021-12-12T06:14:56-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:3298",
+      "dateFinished": "2021-12-12T06:17:13-0500",
+      "dateStarted": "2021-12-12T06:16:44-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "6674\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%pyspark\ncount_document_violations('permit_issuance', 'Job #', 'Job doc. #')",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T05:34:17-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=61",
+              "$$hashKey": "object:2335"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=62",
+              "$$hashKey": "object:2336"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639305244354_514437460",
+      "id": "paragraph_1639305244354_514437460",
+      "dateCreated": "2021-12-12T05:34:04-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:2214",
+      "dateFinished": "2021-12-12T05:34:17-0500",
+      "dateStarted": "2021-12-12T05:34:17-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+---------+---+-----+\n|    Job #|max|count|\n+---------+---+-----+\n|100292345| 04|    2|\n|100444075| 04|    2|\n|100721523| 06|    5|\n|100749451| 03|    2|\n|100817573| 03|    2|\n|101472728| 04|    2|\n|101667206| 03|    2|\n|103177731| 03|    2|\n|103219018| 03|    2|\n|104427700| 03|    2|\n|104756694| 03|    2|\n|120653024| 04|    3|\n|121186572| 03|    2|\n|121187777| 03|    2|\n|121324995| 04|    2|\n|122515215| 03|    2|\n|123417383| 04|    2|\n|123590756| 03|    2|\n|200108338| 03|    2|\n|200587294| 04|    2|\n+---------+---+-----+\nonly showing top 20 rows\n\n10539\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%pyspark\ndob_violations = find_document_violations('/user/CS-GY-6513/project_data/data-cityofnewyork-us.ipu4-2q9a.csv', 'BOROUGH', 4, 5)\nprint(dob_violations.count())",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T06:18:05-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=78",
+              "$$hashKey": "object:3530"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639307844319_155039880",
+      "id": "paragraph_1639307844319_155039880",
+      "dateCreated": "2021-12-12T06:17:24-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:3421",
+      "dateFinished": "2021-12-12T06:18:44-0500",
+      "dateStarted": "2021-12-12T06:18:05-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "10539\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%pyspark\ncount_document_violations('dob_job_application_filings', 'Job #', 'Doc #')",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T05:34:58-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/scala",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=63",
+              "$$hashKey": "object:2471"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=64",
+              "$$hashKey": "object:2472"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=65",
+              "$$hashKey": "object:2473"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=66",
+              "$$hashKey": "object:2474"
+            },
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=67",
+              "$$hashKey": "object:2475"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639304551059_728853669",
+      "id": "paragraph_1639304551059_728853669",
+      "dateCreated": "2021-12-12T05:22:31-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:982",
+      "dateFinished": "2021-12-12T05:35:43-0500",
+      "dateStarted": "2021-12-12T05:34:58-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "+---------+---+-----+\n|    Job #|max|count|\n+---------+---+-----+\n|102044681| 05|    3|\n|300948081| 02|    1|\n|104233465| 05|    4|\n|104773309| 03|    2|\n|120718848| 03|    2|\n|200599806| 02|    1|\n|300839957| 06|    5|\n|301044965| 03|    2|\n|200440219| 02|    1|\n|200580228| 02|    1|\n|200580237| 02|    1|\n|300730172| 02|    1|\n|300948599| 02|    1|\n|321192721| 05|    4|\n|321714418| 03|    2|\n|401016440| 02|    1|\n|220670815| 03|    2|\n|300935610| 02|    1|\n|301425740| 04|    3|\n|401004836| 02|    1|\n+---------+---+-----+\nonly showing top 20 rows\n\n1097\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%pyspark\njob_application_filings_violations = find_document_violations('/user/CS-GY-6513/project_data/data-cityofnewyork-us.ic3t-wcy2.csv', 'Job #', 0, 1)\nprint(job_application_filings_violations.count())",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T06:18:58-0500",
+      "progress": 0,
+      "config": {
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "colWidth": 12,
+        "editorMode": "ace/mode/python",
+        "fontSize": 9,
+        "results": {},
+        "enabled": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {
+        "jobUrl": {
+          "propertyName": "jobUrl",
+          "label": "SPARK JOB",
+          "tooltip": "View in Spark web UI",
+          "group": "spark",
+          "values": [
+            {
+              "jobUrl": "http://hc11.nyu.cluster:44088/jobs/job?id=79",
+              "$$hashKey": "object:3644"
+            }
+          ],
+          "interpreterSettingId": "spark"
+        }
+      },
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639304853791_2120721782",
+      "id": "paragraph_1639304853791_2120721782",
+      "dateCreated": "2021-12-12T05:27:33-0500",
+      "status": "FINISHED",
+      "focus": true,
+      "$$hashKey": "object:1278",
+      "dateFinished": "2021-12-12T06:19:23-0500",
+      "dateStarted": "2021-12-12T06:18:58-0500",
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "1097\n"
+          }
+        ]
+      }
+    },
+    {
+      "text": "%pyspark\n",
+      "user": "nbuser",
+      "dateUpdated": "2021-12-12T06:18:58-0500",
+      "progress": 0,
+      "config": {
+        "colWidth": 12,
+        "fontSize": 9,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "python",
+          "editOnDblClick": false,
+          "completionKey": "TAB",
+          "completionSupport": true
+        },
+        "editorMode": "ace/mode/python"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "runtimeInfos": {},
+      "progressUpdateIntervalMs": 500,
+      "jobName": "paragraph_1639307938310_779824623",
+      "id": "paragraph_1639307938310_779824623",
+      "dateCreated": "2021-12-12T06:18:58-0500",
+      "status": "READY",
+      "focus": true,
+      "$$hashKey": "object:3544"
+    }
+  ],
+  "name": "Big Data 6513 Team 10",
+  "id": "2GS2CS1YJ",
+  "defaultInterpreterGroup": "spark",
+  "version": "0.9.0",
+  "noteParams": {},
+  "noteForms": {},
+  "angularObjects": {},
+  "config": {
+    "isZeppelinNotebookCronEnable": false,
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {},
+  "path": "/Big Data 6513 Team 10"
+}
